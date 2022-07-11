@@ -88,6 +88,13 @@ export const store = new Vuex.Store({
         }
     },
     actions: {
+        async login(context, username, password){
+            const dispatcherResponse = await network.getDispatcherState();
+            const allLinks = parse(dispatcherResponse.headers.link);
+            console.log(allLinks);
+            const url = allLinks['getAllStudentProjectsWithFilter'].url.replace("{QUERY}", username);
+            await context.dispatch('loadPage', url);
+        },
         async getAllStudentProjects(context, search) {
             const dispatcherResponse = await network.getDispatcherState();
             const allLinks = parse(dispatcherResponse.headers.link);

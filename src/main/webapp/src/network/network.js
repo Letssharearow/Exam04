@@ -5,11 +5,13 @@ class NetworkService {
     httpClient = axios.create({
         headers: {
             "Accept": "application/json",
+            "Access-Control-Allow-Origin": "*"
         }
     });
 
     getDispatcherState() {
-        return this.httpClient.get("http://localhost:8080/vuejs/api/");
+        return this.httpClient.get("http://localhost:8080/login/api/");
+
     }
 
     getAllStudentProjectsState(url) {

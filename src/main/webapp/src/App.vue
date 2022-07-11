@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <StudentsProjectsApp/>
+    <Login/>
   </div>
 </template>
 
 <script>
-import StudentsProjectsApp from "@/components/main/StudentsProjectsApp";
+import Login from "@/Exam04/Login";
 
 export default {
   name: 'App',
   components: {
-    StudentsProjectsApp,
+    Login,
   }
 }
 </script>
@@ -23,5 +23,7 @@ export default {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
+  background-color: #2c3e50;
 }
 </style>
