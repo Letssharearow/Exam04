@@ -5,11 +5,11 @@ class NetworkService {
     httpClient = axios.create({
         headers: {
             "Accept": "application/json",
-            "Access-Control-Allow-Origin": "*"
         }
     });
 
     getDispatcherState() {
+        console.log(this.httpClient.defaults.headers);
         return this.httpClient.get("http://localhost:8080/login/api/");
 
     }
