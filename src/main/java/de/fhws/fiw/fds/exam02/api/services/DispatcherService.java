@@ -25,6 +25,6 @@ import javax.ws.rs.core.Response;
 		final User user = BasicAuthHelper.accessControl(this.httpServletRequest);
 		String token = BearerAuthHelper.createToken(user.getName());
 
-		return Response.ok(token).header("Access-Control-Allow-Origin", "*").build();
+		return Response.ok(token).build();
 	}
 }
