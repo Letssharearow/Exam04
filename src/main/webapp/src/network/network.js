@@ -10,8 +10,22 @@ class NetworkService {
 
     getDispatcherState() {
         console.log(this.httpClient.defaults.headers);
+        const username = "username";
+        const password = "password";
+        console.log(username, password);
         return this.httpClient.get("http://localhost:8080/login/api/");
 
+    }
+
+    getToken(){
+        const username = "username";
+        const password = "password";
+        return this.httpClient.get("http://localhost:8080/login/api", {
+            auth: {
+                username,
+                password
+            }
+        });
     }
 
     getAllStudentProjectsState(url) {
