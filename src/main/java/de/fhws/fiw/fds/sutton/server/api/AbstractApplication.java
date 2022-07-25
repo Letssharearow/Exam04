@@ -18,7 +18,7 @@ package de.fhws.fiw.fds.sutton.server.api;
 
 import com.owlike.genson.GensonBuilder;
 import com.owlike.genson.ext.jaxrs.GensonJaxRSFeature;
-import org.apache.catalina.filters.CorsFilter;
+import de.fhws.fiw.fds.exam03.CorsFilter;
 import org.glassfish.jersey.linking.DeclarativeLinkingFeature;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
