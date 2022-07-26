@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+export const notAuthorized = "not Authorized";
+
 class NetworkService {
 
     httpClient = axios.create({
@@ -9,18 +11,24 @@ class NetworkService {
     });
 
     getDispatcherState() {
-        console.log(this.httpClient.defaults.headers);
-        const username = "username";
-        const password = "password";
-        console.log(username, password);
         return this.httpClient.get("http://localhost:8080/login/api/");
-
     }
 
-    getToken(){
-        const username = "username";
-        const password = "password";
-        return this.httpClient.get("http://localhost:8080/login/api", {
+    getDispatcherStateToken(token) {
+        const config = {
+            headers: { Authorization: "Bearer "+ token }
+        };
+        return this.httpClient.get("http://localhost:8080/login/api/", config);
+    }
+
+    getToken(username, password){
+        this.httpClient.interceptors.response.use(response => {
+            return response;
+        }, () => {
+            return notAuthorized;
+        });
+
+        return this.httpClient.get("http://localhost:8080/login/api/me", {
             auth: {
                 username,
                 password

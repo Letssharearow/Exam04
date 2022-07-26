@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import network from '@/network/network';
+import network, {notAuthorized} from '@/network/network';
 
 const parse = require('parse-link-header');
 
@@ -41,7 +41,10 @@ export const store = new Vuex.Store({
         toggleStudentsOfProjectUrl: undefined,
         showingLinkedStudents: false,
         clearSearchField: false,
-        editStudentProjectErrorMessage: ""
+        editStudentProjectErrorMessage: "",
+        currentToken: "",
+        errorMessage: "Click me to hide Error Message",
+        isAuthorized: false,
     },
     mutations: {
         SET_PROJECTS(state, {projects, createUrl, nextUrl, prevUrl}) {
@@ -83,18 +86,42 @@ export const store = new Vuex.Store({
         CREATE_NEW_PROJECT(state) {
             /* TODO */
         },
+        SET_CURRENT_TOKEN(state, token) {
+            state.currentToken = token;
+        },
         SET_ERROR_MESSAGE(state, errorMessage) {
-            state.editStudentProjectErrorMessage = errorMessage;
+            state.errorMessage = errorMessage;
+        },
+        SET_AUTHORIZED(state, value) {
+            state.isAuthorized = value;
         }
     },
     actions: {
-        async login(context, username, password){
-            const dispatcherResponse = await network.getDispatcherState();
-            console.log(dispatcherResponse);
-            const allHeaders = dispatcherResponse.headers;
-            console.log(allHeaders);
-            // const url = allLinks['getAllStudentProjectsWithFilter'].url.replace("{QUERY}", username);
-            // await context.dispatch('loadPage', url);
+
+        resetErrorMessage(context){
+            context.commit("SET_ERROR_MESSAGE", "");
+        },
+        setUnauthorized(context){
+            context.commit("SET_AUTHORIZED", false);
+        },
+
+        async login(context, usernameAndPassword){
+            if(this.state.currentToken === ""){
+                const meResponse = await network.getToken(usernameAndPassword.username, usernameAndPassword.password);
+                context.commit("SET_CURRENT_TOKEN", meResponse.data);
+            }
+            let firstDispatcherStateToken = await network.getDispatcherStateToken(context.state.currentToken);
+            if(firstDispatcherStateToken === notAuthorized){
+                const meResponse = await network.getToken(usernameAndPassword.username, usernameAndPassword.password);
+                context.commit("SET_CURRENT_TOKEN", meResponse.data);
+            }
+            let secondDispatcherStateToken = await network.getDispatcherStateToken(context.state.currentToken);
+            if(secondDispatcherStateToken === notAuthorized){
+                context.commit("SET_ERROR_MESSAGE", "wrong Username or Password");
+            }
+            else{
+                context.commit("SET_AUTHORIZED", true);
+            }
         },
         async getAllStudentProjects(context, search) {
             const dispatcherResponse = await network.getDispatcherState();
@@ -218,6 +245,12 @@ export const store = new Vuex.Store({
         },
         isPrevPageAvailable(state) {
             return state.prevUrl != undefined;
+        },
+        errorMessage(state){
+            return state.errorMessage;
+        },
+        isAuthorized(state){
+            return state.isAuthorized;
         }
     }
 })

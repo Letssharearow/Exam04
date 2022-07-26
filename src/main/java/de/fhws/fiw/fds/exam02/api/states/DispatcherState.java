@@ -2,6 +2,7 @@ package de.fhws.fiw.fds.exam02.api.states;
 
 import de.fhws.fiw.fds.exam02.api.hypermedia.rel_types.IOtherRelTypes;
 import de.fhws.fiw.fds.exam02.api.hypermedia.uris.IOtherServicesUri;
+import de.fhws.fiw.fds.exam02.api.security.BearerAuthHelper;
 import de.fhws.fiw.fds.sutton.server.api.states.AbstractState;
 import de.fhws.fiw.fds.sutton.server.api.states.get.AbstractGetDispatcherState;
 
@@ -17,6 +18,8 @@ public class DispatcherState extends AbstractGetDispatcherState
 
 	@Override protected Response createResponse()
 	{
+		BearerAuthHelper.accessControl(this.httpServletRequest);
+
 		defineHttpResponseBody();
 
 		defineSelfLink();
@@ -24,7 +27,6 @@ public class DispatcherState extends AbstractGetDispatcherState
 		defineTransitionLinks();
 
 		this.responseBuilder.header("Authentication", "Bearer Token");
-		this.responseBuilder.header("Access-Control-Allow-Origin", "*");
 
 		return this.responseBuilder.build();
 	}
