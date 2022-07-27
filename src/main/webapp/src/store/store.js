@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import network, {notAuthorized} from '@/network/network';
+import network, {notAuthorized, notConnected} from '@/network/network';
 
 const parse = require('parse-link-header');
 
@@ -105,32 +105,44 @@ export const store = new Vuex.Store({
             context.commit("SET_AUTHORIZED", false);
         },
 
-        async login(context, usernameAndPassword){
-            if(this.state.currentToken === ""){
-                const meResponse = await network.getToken(usernameAndPassword.username, usernameAndPassword.password);
-            if(secondDispatcherStateToken === undefined) {
-                    context.commit("SET_ERROR_MESSAGE", "Cannot Connect to Server");
-                }
+        async setToken(context, usernameAndPassword){
+            const meResponse = await network.getToken(usernameAndPassword.username, usernameAndPassword.password);
+            if(await context.dispatch("handleResponse", meResponse)){
                 context.commit("SET_CURRENT_TOKEN", meResponse.data);
+                return true;
             }
+            return false;
+        },
+
+        async getDispatcher(context){
             let firstDispatcherStateToken = await network.getDispatcherStateToken(context.state.currentToken);
-            if(firstDispatcherStateToken === notAuthorized){
-                const meResponse = await network.getToken(usernameAndPassword.username, usernameAndPassword.password);
-                context.commit("SET_CURRENT_TOKEN", meResponse.data);
+            if(await context.dispatch("handleResponse", firstDispatcherStateToken)){
+                context.commit("SET_AUTHORIZED", true);
+                return true;
             }
-            else if(secondDispatcherStateToken === undefined) {
+            return false;
+        },
+
+        handleResponse(context, tokenResponse){
+            console.log("tokenREsponse", tokenResponse);
+            if(tokenResponse === notConnected) {
                 context.commit("SET_ERROR_MESSAGE", "Cannot Connect to Server");
             }
-            let secondDispatcherStateToken = await network.getDispatcherStateToken(context.state.currentToken);
-            if(secondDispatcherStateToken === notAuthorized){
+            else if(tokenResponse === notAuthorized){
                 context.commit("SET_ERROR_MESSAGE", "wrong Username or Password");
             }
-            else if(secondDispatcherStateToken === undefined) {
-                context.commit("SET_ERROR_MESSAGE", "Cannot Connect to Server");
+            else {
+                return true;
             }
-            else{
-                    context.commit("SET_AUTHORIZED", true);
+            return false;
+        },
+
+        async login(context, usernameAndPassword){
+            if(this.state.currentToken === "" || ! await context.dispatch("getDispatcher",context)){
+                if(await context.dispatch("setToken", usernameAndPassword)){
+                    await context.dispatch("getDispatcher",context);
                 }
+            }
         },
         async getAllStudentProjects(context, search) {
             const dispatcherResponse = await network.getDispatcherState();
