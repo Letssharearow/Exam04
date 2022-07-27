@@ -11,6 +11,7 @@ class NetworkService {
         }
     });
 
+
     onFulfilled = response => {
         return response;
     };
@@ -39,6 +40,7 @@ class NetworkService {
         const config = {
             headers: { Authorization: "Bearer "+ token }
         };
+        this.httpClient.interceptors.response.use(this.onFulfilled, this.onRejected);
         return this.httpClient.get("http://localhost:8080/login/api/", config);
     }
 
