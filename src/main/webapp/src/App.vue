@@ -12,7 +12,7 @@
       Your login was successful
       </p>
       </div>
-      <button @click="$store.dispatch('setUnauthorized')">
+      <button @click="$store.dispatch('reset')">
         Logout
       </button>
     </div>
