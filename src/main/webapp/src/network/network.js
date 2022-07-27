@@ -26,11 +26,19 @@ class NetworkService {
         this.httpClient.interceptors.response.use(response => {
             return response;
         }, (error) => {
-            console.log(error.statusCode)
-            if(error.statusCode === 401){
-                return notAuthorized;
+            //https://axios-http.com/docs/handling_errors
+            if (error.response) {
+                if(error.response.status === 401){
+                    return notAuthorized;
+                }
+            } else if (error.request) {
+                console.log("error.request", error.request);
+                return notConnected;
+            } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error', error.message);
             }
-            return error.statusCode;
+            return error;
         });
 
         return this.httpClient.get("http://localhost:8080/login/api/me", {
