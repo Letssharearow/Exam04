@@ -108,6 +108,9 @@ export const store = new Vuex.Store({
         async login(context, usernameAndPassword){
             if(this.state.currentToken === ""){
                 const meResponse = await network.getToken(usernameAndPassword.username, usernameAndPassword.password);
+            if(secondDispatcherStateToken === undefined) {
+                    context.commit("SET_ERROR_MESSAGE", "Cannot Connect to Server");
+                }
                 context.commit("SET_CURRENT_TOKEN", meResponse.data);
             }
             let firstDispatcherStateToken = await network.getDispatcherStateToken(context.state.currentToken);
@@ -115,13 +118,19 @@ export const store = new Vuex.Store({
                 const meResponse = await network.getToken(usernameAndPassword.username, usernameAndPassword.password);
                 context.commit("SET_CURRENT_TOKEN", meResponse.data);
             }
+            else if(secondDispatcherStateToken === undefined) {
+                context.commit("SET_ERROR_MESSAGE", "Cannot Connect to Server");
+            }
             let secondDispatcherStateToken = await network.getDispatcherStateToken(context.state.currentToken);
             if(secondDispatcherStateToken === notAuthorized){
                 context.commit("SET_ERROR_MESSAGE", "wrong Username or Password");
             }
-            else{
-                context.commit("SET_AUTHORIZED", true);
+            else if(secondDispatcherStateToken === undefined) {
+                context.commit("SET_ERROR_MESSAGE", "Cannot Connect to Server");
             }
+            else{
+                    context.commit("SET_AUTHORIZED", true);
+                }
         },
         async getAllStudentProjects(context, search) {
             const dispatcherResponse = await network.getDispatcherState();

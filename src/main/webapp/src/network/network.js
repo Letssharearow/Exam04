@@ -24,8 +24,12 @@ class NetworkService {
     getToken(username, password){
         this.httpClient.interceptors.response.use(response => {
             return response;
-        }, () => {
-            return notAuthorized;
+        }, (error) => {
+            console.log(error.statusCode)
+            if(error.statusCode === 401){
+                return notAuthorized;
+            }
+            return error.statusCode;
         });
 
         return this.httpClient.get("http://localhost:8080/login/api/me", {
