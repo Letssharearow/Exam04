@@ -124,7 +124,6 @@ export const store = new Vuex.Store({
         },
 
         handleResponse(context, tokenResponse){
-            console.log("tokenREsponse", tokenResponse);
             if(tokenResponse === notConnected) {
                 context.commit("SET_ERROR_MESSAGE", "Cannot Connect to Server");
             }
