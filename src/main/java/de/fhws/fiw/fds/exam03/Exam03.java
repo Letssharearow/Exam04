@@ -17,6 +17,7 @@
 package de.fhws.fiw.fds.exam03;
 
 import de.fhws.fiw.fds.exam02.api.services.DispatcherService;
+import de.fhws.fiw.fds.exam02.api.services.TokenService;
 import de.fhws.fiw.fds.sutton.server.api.AbstractApplication;
 
 import javax.ws.rs.ApplicationPath;
@@ -34,6 +35,7 @@ import java.util.Set;
 	{
 		final Set<Class<?>> returnValue = new HashSet<>();
 		returnValue.add(DispatcherService.class);
+		returnValue.add(TokenService.class);
 
 		return returnValue;
 	}

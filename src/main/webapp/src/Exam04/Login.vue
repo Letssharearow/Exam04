@@ -1,11 +1,11 @@
 <template>
   <div class="center">
   <div class="Login" @keydown.enter="login">
-    Login to proceed <br><br>
+    Please Login to proceed <br><br>
   <input data-v-54092aab="" v-model="username"  type="text" placeholder="Username ..." class="form-control">
     <div class="space"></div>
   <input data-v-54092aab="" v-model="password"  type="password" placeholder="Password ..." class="form-control">
-    <br><br>
+    <br>
     <button @click="login">
       Login
     </button>

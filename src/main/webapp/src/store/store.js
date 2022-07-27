@@ -43,7 +43,7 @@ export const store = new Vuex.Store({
         clearSearchField: false,
         editStudentProjectErrorMessage: "",
         currentToken: "",
-        errorMessage: "Click me to hide Error Message",
+        errorMessage: "",
         isAuthorized: false,
     },
     mutations: {

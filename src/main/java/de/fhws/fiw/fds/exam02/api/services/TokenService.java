@@ -12,11 +12,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("") public class DispatcherService extends AbstractService
+@Path("") public class TokenService extends AbstractService
 {
-	@GET @Produces(MediaType.APPLICATION_JSON) public Response get()
+
+	@Path("me") @GET @Produces(MediaType.APPLICATION_JSON) public Response me()
 	{
-		return new DispatcherState.Builder().setUriInfo(this.uriInfo).setRequest(this.request)
-			.setHttpServletRequest(this.httpServletRequest).setContext(this.context).build().execute();
+		final User user = BasicAuthHelper.accessControl(this.httpServletRequest);
+		String token = BearerAuthHelper.createToken(user.getName());
+
+		return Response.ok(token).build();
 	}
 }
