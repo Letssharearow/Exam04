@@ -11,6 +11,26 @@ class NetworkService {
         }
     });
 
+    onFulfilled = response => {
+        return response;
+    };
+
+    onRejected = (error) => {
+        //https://axios-http.com/docs/handling_errors
+        if (error.response) {
+            if(error.response.status === 401){
+                return notAuthorized;
+            }
+        } else if (error.request) {
+            console.log("error.request", error.request);
+            return notConnected;
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', error.message);
+        }
+        return error;
+    };
+
     getDispatcherState() {
         return this.httpClient.get("http://localhost:8080/login/api/");
     }
@@ -23,23 +43,7 @@ class NetworkService {
     }
 
     getToken(username, password){
-        this.httpClient.interceptors.response.use(response => {
-            return response;
-        }, (error) => {
-            //https://axios-http.com/docs/handling_errors
-            if (error.response) {
-                if(error.response.status === 401){
-                    return notAuthorized;
-                }
-            } else if (error.request) {
-                console.log("error.request", error.request);
-                return notConnected;
-            } else {
-                // Something happened in setting up the request that triggered an Error
-                console.log('Error', error.message);
-            }
-            return error;
-        });
+        this.httpClient.interceptors.response.use(this.onFulfilled, this.onRejected);
 
         return this.httpClient.get("http://localhost:8080/login/api/me", {
             auth: {
