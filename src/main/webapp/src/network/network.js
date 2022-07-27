@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 export const notAuthorized = "not Authorized";
+export const notConnected = "not Connected";
 
 class NetworkService {
 
