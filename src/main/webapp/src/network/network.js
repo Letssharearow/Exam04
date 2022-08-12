@@ -7,10 +7,9 @@ class NetworkService {
 
     httpClient = axios.create({
         headers: {
-            "Accept": "application/json",
+            "Accept": "*/*",
         }
     });
-
 
     onFulfilled = response => {
         return response;
@@ -49,6 +48,11 @@ class NetworkService {
                 password
             }
         });
+    }
+
+    getKnowledge(){
+        this.httpClient.interceptors.response.use(this.onFulfilled, this.onRejected);
+        return this.httpClient.get("http://localhost:8080/login/api/knowledge");
     }
 }
 

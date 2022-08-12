@@ -69,6 +69,10 @@ export const store = new Vuex.Store({
                     await context.dispatch("getDispatcher",context);
                 }
             }
+        },
+
+        async getGK(){
+            return await network.getKnowledge();
         }
     },
     getters: {
