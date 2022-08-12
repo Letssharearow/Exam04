@@ -18,7 +18,7 @@ class NetworkService {
     onRejected = (error) => {
         //https://axios-http.com/docs/handling_errors
         if (error.response) {
-            if(error.response.status === 401){
+            if (error.response.status === 401) {
                 return notAuthorized;
             }
         } else if (error.request) {
@@ -33,26 +33,31 @@ class NetworkService {
 
     getDispatcherStateToken(token) {
         const config = {
-            headers: { Authorization: "Bearer "+ token }
+            headers: {Authorization: "Bearer " + token}
         };
         this.httpClient.interceptors.response.use(this.onFulfilled, this.onRejected);
         return this.httpClient.get("http://localhost:8080/login/api/", config);
     }
 
-    getToken(username, password){
+    getToken(username, password) {
         this.httpClient.interceptors.response.use(this.onFulfilled, this.onRejected);
 
         return this.httpClient.get("http://localhost:8080/login/api/me", {
             auth: {
-                username,
+                username: username,
                 password
             }
         });
     }
 
-    getKnowledge(){
+    getKnowledge(url) {
+        const config = {
+            headers: {
+                link: url
+            }
+        };
         this.httpClient.interceptors.response.use(this.onFulfilled, this.onRejected);
-        return this.httpClient.get("http://localhost:8080/login/api/knowledge");
+        return this.httpClient.get("http://localhost:8080/login/api/knowledge", config);
     }
 }
 

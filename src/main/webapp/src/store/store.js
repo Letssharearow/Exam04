@@ -23,63 +23,61 @@ export const store = new Vuex.Store({
     },
     actions: {
 
-        resetErrorMessage(context){
+        resetErrorMessage(context) {
             context.commit("SET_ERROR_MESSAGE", "");
         },
 
-        async setToken(context, usernameAndPassword){
+        async setToken(context, usernameAndPassword) {
             const meResponse = await network.getToken(usernameAndPassword.username, usernameAndPassword.password);
-            if(await context.dispatch("handleResponse", meResponse)){
+            if (await context.dispatch("handleResponse", meResponse)) {
                 context.commit("SET_CURRENT_TOKEN", meResponse.data);
                 return true;
             }
             return false;
         },
 
-        async getDispatcher(context){
+        async getDispatcher(context) {
             let firstDispatcherStateToken = await network.getDispatcherStateToken(context.state.currentToken);
-            if(await context.dispatch("handleResponse", firstDispatcherStateToken)){
+            if (await context.dispatch("handleResponse", firstDispatcherStateToken)) {
                 context.commit("SET_AUTHORIZED", true);
                 return true;
             }
             return false;
         },
 
-        handleResponse(context, tokenResponse){
-            if(tokenResponse === notConnected) {
+        handleResponse(context, tokenResponse) {
+            if (tokenResponse === notConnected) {
                 context.commit("SET_ERROR_MESSAGE", "Cannot Connect to Server");
-            }
-            else if(tokenResponse === notAuthorized){
+            } else if (tokenResponse === notAuthorized) {
                 context.commit("SET_ERROR_MESSAGE", "wrong Username or Password");
-            }
-            else {
+            } else {
                 return true;
             }
             return false;
         },
 
-        reset(context){
+        reset(context) {
             context.commit("SET_AUTHORIZED", false);
             context.commit("SET_CURRENT_TOKEN", "");
         },
 
-        async login(context, usernameAndPassword){
-            if(this.state.currentToken === "" || ! await context.dispatch("getDispatcher",context)){
-                if(await context.dispatch("setToken", usernameAndPassword)){
-                    await context.dispatch("getDispatcher",context);
+        async login(context, usernameAndPassword) {
+            if (this.state.currentToken === "" || !await context.dispatch("getDispatcher", context)) {
+                if (await context.dispatch("setToken", usernameAndPassword)) {
+                    await context.dispatch("getDispatcher", context);
                 }
             }
         },
 
-        async getGK(){
-            return await network.getKnowledge();
+        async getGK(context, url) {
+            return await network.getKnowledge(url);
         }
     },
     getters: {
-        errorMessage(state){
+        errorMessage(state) {
             return state.errorMessage;
         },
-        isAuthorized(state){
+        isAuthorized(state) {
             return state.isAuthorized;
         }
     }

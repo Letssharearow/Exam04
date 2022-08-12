@@ -1,10 +1,9 @@
 <template>
   <div class="center">
     <div class="Login" @keydown.enter="login">
-      Please Login to proceed <br><br>
-      <input data-v-54092aab="" v-model="username" type="text" placeholder="Username ..." class="form-control">
+      Enter Link to download <br><br>
+      <input data-v-54092aab="" v-model="url" type="text" placeholder="Link ..." class="form-control">
       <div class="space"></div>
-      <input data-v-54092aab="" v-model="password" type="password" placeholder="Password ..." class="form-control">
       <br>
       <button @click="login">
         Login
@@ -21,7 +20,7 @@ export default {
 
   , data: function () {
     return {
-      username: "",
+      url: "",
       password: "",
       file: {}
     }
@@ -44,7 +43,7 @@ export default {
       this.file = tempFile;
     }, login() {
       console.log("file", this.file);
-      let promise = this.$store.dispatch('getGK');
+      let promise = this.$store.dispatch('getGK', this.url);
       promise.then((response) => {
         let htmlElement = this.createElementFromHTML(response.data);
         let allQuestions = this.getQuestionsFromElement(htmlElement);

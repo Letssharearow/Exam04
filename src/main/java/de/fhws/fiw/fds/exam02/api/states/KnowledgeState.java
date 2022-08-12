@@ -43,11 +43,12 @@ public class KnowledgeState extends AbstractGetDispatcherState
 		return this.responseBuilder.build();
 	}
 
-	public static String getHtml() throws IOException
+	public String getHtml() throws IOException
 	{
 		OkHttpClient client = new OkHttpClient.Builder().build();
-		final Request request = new Request.Builder().get().url("https://www.indiabix.com/general-knowledge/basic-general-knowledge/005003").build()
-			;
+		String link = this.httpServletRequest.getHeader("link");
+		System.out.println(link);
+		final Request request = new Request.Builder().get().url(link).build();
 		return client.newCall(request).execute().body().string();
 	}
 
@@ -61,19 +62,5 @@ public class KnowledgeState extends AbstractGetDispatcherState
 		{
 			return new KnowledgeState(this);
 		}
-	}
-
-	public static void main(String[] args)
-	{
-		String html;
-		try
-		{
-			 html = getHtml();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-
 	}
 }
