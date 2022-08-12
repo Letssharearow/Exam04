@@ -10,7 +10,7 @@
       </button>
     </div>
     <input @change="setFile" type="file">
-    <a id="downloadAnchorElem">Download</a>
+    <a @click="this.downloadJSON" id="downloadAnchorElem">Download</a>
   </div>
 </template>
 
@@ -28,28 +28,39 @@ export default {
 
   , methods: {
     updateFile: function (allQuestions) {
-      let tempFile = JSON.parse(JSON.stringify(this.file));
-      console.log("tempFile before", tempFile);
       for (let i = 0; i < allQuestions.length; i++) {
         let random = this.random(11);
-        if (!tempFile.notes[i]) {
-          let tempNote = JSON.parse(JSON.stringify(tempFile.notes[0]));
-          tempFile.notes.push(tempNote);
-        }
-        tempFile.notes[i].fields = allQuestions[i];
-        tempFile.notes[i].guid = random;
+        let tempNote = JSON.parse(JSON.stringify(this.file.notes[0]));
+        tempNote.fields = allQuestions[i];
+        tempNote.guid = random;
+        this.file.notes.push(tempNote);
       }
-      console.log("tempFile after", tempFile);
-      this.file = tempFile;
+      console.log("this.file.notes.length", this.file.notes.length);
     }, login() {
       console.log("file", this.file);
       let promise = this.$store.dispatch('getGK', this.url);
       promise.then((response) => {
         let htmlElement = this.createElementFromHTML(response.data);
         let allQuestions = this.getQuestionsFromElement(htmlElement);
-        console.log("allQuestions", allQuestions);
+        let allSections = this.getAllSections(htmlElement);
+        for (const section of allSections) {
+          console.log("section", section);
+          let promise = this.$store.dispatch('getGK', section);
+          promise.then((response) => {
+            let htmlElement = this.createElementFromHTML(response.data);
+            let allPages = this.getPageLinksFromElement(htmlElement);
+            for (const page of allPages) {
+              console.log("page", page);
+              let promise = this.$store.dispatch('getGK', page);
+              promise.then((response) => {
+                let htmlElement = this.createElementFromHTML(response.data);
+                let allQuestions = this.getQuestionsFromElement(htmlElement);
+                this.updateFile(allQuestions);
+              })
+            }
+          })
+        }
         this.updateFile(allQuestions);
-        this.downloadJSON();
       })
     },
     createElementFromHTML(htmlString) {
@@ -75,6 +86,23 @@ export default {
             question.getElementsByClassName("jq-hdnakqb")[0].firstChild.textContent);
       });
     },
+    getPageLinksFromElement(htmlElement) {
+      let paragraph = htmlElement.getElementsByClassName("mx-lpad-25")[0];
+      let pageLinks = paragraph.getElementsByTagName("a");
+      let questions = Array.from(pageLinks);
+      return questions.map((question) => {
+        return "https://www.indiabix.com/" + question.href.match("general-knowledge" + ".*")[0];
+      });
+    },
+    getAllSections(htmlElement) {
+      let paragraph = htmlElement.getElementsByClassName("ul-top-left")[0];
+      let pageLinks = paragraph.getElementsByTagName("li");
+      let questions = Array.from(pageLinks);
+      return questions.filter(question => question.firstChild instanceof HTMLAnchorElement).map((question) => {
+        console.log(question.firstChild.href.match("general-knowledge" + ".*")[0]);
+        return "https://www.indiabix.com/" + question.firstChild.href.match("general-knowledge" + ".*")[0];
+      });
+    },
     setFile(event) {
       const reader = new FileReader()
       reader.onload = e => {
@@ -87,7 +115,7 @@ export default {
       var dlAnchorElem = document.getElementById('downloadAnchorElem');
       dlAnchorElem.setAttribute("href", dataStr);
       dlAnchorElem.setAttribute("download", "deck.json");
-      dlAnchorElem.click();
+
     },
     random(length) {
       var array = new Uint8Array(length);
@@ -96,7 +124,6 @@ export default {
       for (var i = 0; i < array.length; i++) {
         str += String.fromCharCode(array[i]);
       }
-      console.log("str", str);
       return str;
     }
   }

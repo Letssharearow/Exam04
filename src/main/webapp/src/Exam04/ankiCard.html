@@ -8,21 +8,21 @@
 
 <div id="main-div">
 
-    <h1>Question</h1>
+    <h1>{{ question }}</h1>
     <div class="answer">a)
-        <div>answer a</div>
+        <div>{{ a }}</div>
     </div>
     <div class="answer">b)
-        <div>answer a</div>
+        <div>{{ b }}</div>
     </div>
     <div class="answer">c)
-        <div>answer a</div>
+        <div>{{ c }}</div>
     </div>
     <div class="answer">d)
-        <div>answer a</div>
+        <div>{{ d }}</div>
     </div>
 
-    <input id="solution" type="hidden" value="solution">
+    <input id="solution" type="hidden" value="{{solution}}">
 </div>
 
 <script>
@@ -60,6 +60,14 @@
 </script>
 
 <style>
+    .card {
+        font-family: arial;
+        font-size: 20px;
+        text-align: center;
+        color: black;
+        background-color: white;
+    }
+
     .answer {
         background-color: #04084b;
         border: #000000 1px solid;
@@ -71,11 +79,8 @@
     #main-div {
         background-color: #250324;
         padding: 10px;
-        top: 0;
-        left: 0;
-        position: fixed;
-
         color: #bde5f3;
+        margin: auto;
     }
 </style>
 </body>
