@@ -11,6 +11,7 @@
       </button>
     </div>
     <input @change="setFile" type="file">
+    <a id="downloadAnchorElem">Download</a>
   </div>
 </template>
 
@@ -27,13 +28,29 @@ export default {
   }
 
   , methods: {
-    login() {
+    updateFile: function (allQuestions) {
+      let tempFile = JSON.parse(JSON.stringify(this.file));
+      console.log("tempFile before", tempFile);
+      for (let i = 0; i < allQuestions.length; i++) {
+        let random = this.random(11);
+        if (!tempFile.notes[i]) {
+          let tempNote = JSON.parse(JSON.stringify(tempFile.notes[0]));
+          tempFile.notes.push(tempNote);
+        }
+        tempFile.notes[i].fields = allQuestions[i];
+        tempFile.notes[i].guid = random;
+      }
+      console.log("tempFile after", tempFile);
+      this.file = tempFile;
+    }, login() {
       console.log("file", this.file);
       let promise = this.$store.dispatch('getGK');
       promise.then((response) => {
         let htmlElement = this.createElementFromHTML(response.data);
-        let map = this.getQuestionsFromElement(htmlElement);
-        console.log("map", map);
+        let allQuestions = this.getQuestionsFromElement(htmlElement);
+        console.log("allQuestions", allQuestions);
+        this.updateFile(allQuestions);
+        this.downloadJSON();
       })
     },
     createElementFromHTML(htmlString) {
@@ -45,29 +62,43 @@ export default {
     getQuestionsFromElement(htmlElement) {
       let elementsByClassName = htmlElement.getElementsByClassName("bix-tbl-container");
       let questions = Array.from(elementsByClassName);
-      let array = questions.map((question) => {
-        return {
-          "question": question.getElementsByClassName("bix-td-qtxt")[0].firstChild.textContent,
-          "answer": Array.from(question.getElementsByClassName("bix-td-option")).map(answer => answer.textContent).filter(answer => answer.length !== 2),
-          "solution": question.getElementsByClassName("jq-hdnakqb")[0].firstChild.textContent
-        };
+
+
+      // function isTextAnswer(answer) {
+      //   return !answer.match("[ABCD]\\.");
+      // }
+
+      return questions.map((question) => {
+        return [question.getElementsByClassName("bix-td-qtxt")[0].firstChild.textContent].concat(
+            Array.from(question.getElementsByClassName("bix-td-option")).filter(answer => {
+              return !(answer.firstChild instanceof HTMLAnchorElement);
+            }).map(answer => answer.textContent)).concat(
+            question.getElementsByClassName("jq-hdnakqb")[0].firstChild.textContent);
       });
-      return array;
     },
     setFile(event) {
-      console.log("change");
-      let file = event.target.files[0];
-      console.log("event.target.files", file);
       const reader = new FileReader()
       reader.onload = e => {
-        console.log("result", e.target.result);
         this.file = JSON.parse(e.target.result + "");
-        console.log(this.file);
       };
       reader.readAsText(event.target.files[0]);
     },
-    getAnkiDeckObject() {
-      return JSON.parse()
+    downloadJSON() {
+      var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.file));
+      var dlAnchorElem = document.getElementById('downloadAnchorElem');
+      dlAnchorElem.setAttribute("href", dataStr);
+      dlAnchorElem.setAttribute("download", "deck.json");
+      dlAnchorElem.click();
+    },
+    random(length) {
+      var array = new Uint8Array(length);
+      window.crypto.getRandomValues(array);
+      var str = '';
+      for (var i = 0; i < array.length; i++) {
+        str += String.fromCharCode(array[i]);
+      }
+      console.log("str", str);
+      return str;
     }
   }
 }
