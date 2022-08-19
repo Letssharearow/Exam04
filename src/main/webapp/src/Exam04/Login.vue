@@ -86,6 +86,40 @@ export default {
             question.getElementsByClassName("jq-hdnakqb")[0].firstChild.textContent);
       });
     },
+    getQuestionAndAnswerFromElement(htmlElement) {
+      let elementsByClassName = htmlElement.getElementsByClassName("bix-tbl-container");
+      let questions = Array.from(elementsByClassName);
+
+
+      // function isTextAnswer(answer) {
+      //   return !answer.match("[ABCD]\\.");
+      // }
+
+      return questions.map((question) => {
+        //bix-td-qtxt = question, bix-td-option=answers, jq-hdnakqb= solution
+        let questionString = [question.getElementsByClassName("bix-td-qtxt")[0].firstChild.textContent];
+        let solution = question.getElementsByClassName("jq-hdnakqb")[0].firstChild.textContent.toUpperCase();
+
+        let solutionIndex = 0;
+        if (solution.match("A")) {
+          solutionIndex = 0;
+        } else if (solution.match("B")) {
+          solutionIndex = 1;
+
+        } else if (solution.match("C")) {
+          solutionIndex = 2;
+
+        } else if (solution.match("D")) {
+          solutionIndex = 3;
+
+        }
+        let answersStringArray = Array.from(question.getElementsByClassName("bix-td-option")).filter(answer => {
+          return !(answer.firstChild instanceof HTMLAnchorElement);
+        }).map(answer => answer.textContent);
+        return questionString.concat(
+            answersStringArray[solutionIndex]);
+      });
+    },
     getPageLinksFromElement(htmlElement) {
       let paragraph = htmlElement.getElementsByClassName("mx-lpad-25")[0];
       let pageLinks = paragraph.getElementsByTagName("a");
